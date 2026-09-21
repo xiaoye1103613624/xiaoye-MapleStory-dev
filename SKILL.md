@@ -2,7 +2,7 @@
 name: xiaoye-MapleStory-dev
 description: >-
   全局通用的萧曳冒险岛（MapleStory）全栈开发规范与闭环交付流程，不绑定单一仓库。
-  适用于任意 MapleStory 私服/工具链：OdinMS、HeavenMS、Cosmic、BeiDou、自定义端等。
+  适用于任意 MapleStory 单机版/工具链：OdinMS、HeavenMS、Cosmic、BeiDou、自定义端等。
   覆盖服务端、管理后台、客户端插件、WZ/IMG/XML、IDA 校准、跨版本同步、编码、
   单测与构建、产物保留、功能文档与原子提交；道具资源可经小册子等图鉴站补齐，
   外观道具仅图标时须用户确认是否继续完整同步；收到功能需求后须先全面思考、提交决策点供用户抉择，
@@ -10,14 +10,16 @@ description: >-
   插问时先提示是否继续再答新问题；插件改完自动同步客户端，占用冲突首遇询问其后按首次选择执行；
   须完整注释与分级节点日志，调试期自动开调试日志、功能完成后删除临时调试日志；
   其它语言/框架开发亦可遵循其中通用工程规范。
-  Use when developing any MapleStory feature, private server, client plugin, wz/img/xml,
+  Use when developing any MapleStory feature, single-player, client plugin, wz/img/xml,
   item resources, resource sync, planning MapleStory work, or when the user mentions 冒险岛、
-  MapleStory、xiaoye-MapleStory-dev、插件修改、WZ、IMG、道具、小册子、私服开发、开发计划。
+  MapleStory、xiaoye-MapleStory-dev、插件修改、WZ、IMG、道具、小册子、单机版开发、开发计划。
 ---
 
 # xiaoye-MapleStory-dev（萧曳冒险岛 · 全局）
 
 本 skill 为**萧曳冒险岛**全局规范：凡冒险岛相关开发均可使用，**不局限于某一项目**。
+
+> **用途与免责声明**：本 skill 仅用于**个人学习与技术研究**，面向**单机版（本地 / 离线）**环境；**严禁任何商业用途**（含对外运营、收费盈利、公开联网服务、商业分发或二次售卖）。使用者需自行承担使用风险与合规责任，并遵守所涉第三方项目的许可条款（如 BeiDou 系列 AGPL-3.0）。
 
 优先级：
 
@@ -207,7 +209,7 @@ Task Progress:
 1. **先查本地**：当前项目及用户本机其它相关目录（其它客户端 Data/EN、其它版本 WZ/XML、历史补丁产物等）。
 2. **本地没有再用资源站**：可查询并同步自冒险岛资源网站，例如：
    - [小册子道具列表](https://mxd.dvg.cn/item_list.php?sort=main_category&dir=desc&page=1&page_size=100)（`mxd.dvg.cn`）
-   - 同类图鉴/WZ/道具站（maplestory.io、其它私服图鉴等，以当时可用且合法来源为准）
+   - 同类图鉴/WZ/道具站（maplestory.io、其它图鉴等，以当时可用且合法来源为准）
 3. **同步内容要对齐用途**：不仅 item id/名称，还须按道具类型评估 Character/Item/String/Effect/Sound 等依赖节点是否齐全；经 MCP/工具写入后做抽样校验。
 4. **外观类道具特别处理**（时装/帽子/武器外观/脸型发型等）：
    - **只同步图标（icon/iconRaw）通常不够**——角色身上无模型/部件会缺图、崩溃或显示异常。
