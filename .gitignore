@@ -1,0 +1,10 @@
+# ---- IDE ----
+.idea/*
+!.idea/.gitignore
+
+# ---- Agent / 工具工作区数据 ----
+.codebuddy/
+
+# ---- OS ----
+.DS_Store
+Thumbs.db
