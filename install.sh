@@ -12,7 +12,7 @@
 set -eu
 
 SKILL_NAME="xiaoye-MapleStory-dev"
-SKILL_FILES="SKILL.md checklist.md feature-doc-template.md toolchain.md"
+SKILL_FILES="SKILL.md checklist.md feature-doc-template.md toolchain.md ui-photoshop.md"
 
 TARGET="codebuddy"
 SCOPE="user"
@@ -119,6 +119,7 @@ do_check() {
   echo "  · IDA Pro 8.3+（推荐 9）并已激活 idalib"
   echo "  · MySQL 8 已启动（登录 8484 / API 8686 需服务端与库就绪）"
   echo "  · orange-wz MCP 是否已启动（端口见 mcp-runtime/endpoint.json）"
+  echo "  · Adobe Photoshop + ~/.cursor/mcp.json 中 photoshop 项（见 toolchain.md §7）"
   echo
   info "完整获取 / 构建 / 启动 / MCP 接入步骤见 toolchain.md"
 }

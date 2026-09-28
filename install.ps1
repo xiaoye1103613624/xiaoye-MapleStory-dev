@@ -4,7 +4,7 @@
   安装 xiaoye-MapleStory-dev skill 到指定 Agent 平台的 skills 目录。
 
 .DESCRIPTION
-  把 SKILL.md / checklist.md / feature-doc-template.md / toolchain.md
+  把 SKILL.md / checklist.md / feature-doc-template.md / toolchain.md / ui-photoshop.md
   复制到 <目标 skills 根>/xiaoye-MapleStory-dev/。幂等，可重复执行。
 
   目标目录对照：
@@ -58,7 +58,7 @@ param(
 $ErrorActionPreference = 'Stop'
 
 $SkillName  = 'xiaoye-MapleStory-dev'
-$SkillFiles = @('SKILL.md', 'checklist.md', 'feature-doc-template.md', 'toolchain.md')
+$SkillFiles = @('SKILL.md', 'checklist.md', 'feature-doc-template.md', 'toolchain.md', 'ui-photoshop.md')
 $SourceDir  = $PSScriptRoot
 if (-not $SourceDir) { $SourceDir = Split-Path -Parent $MyInvocation.MyCommand.Path }
 
@@ -150,6 +150,7 @@ function Check-Toolchain {
   Write-Host '  · IDA Pro 8.3+（推荐 9）并已激活 idalib'
   Write-Host '  · MySQL 8 已启动（登录 8484 / API 8686 需服务端与库就绪）'
   Write-Host '  · orange-wz MCP 是否已启动（端口见 mcp-runtime/endpoint.json）'
+  Write-Host '  · Adobe Photoshop + ~/.cursor/mcp.json 中 photoshop 项（见 toolchain.md §7）'
   Write-Host ''
   Write-Info '完整获取 / 构建 / 启动 / MCP 接入步骤见 toolchain.md'
 }

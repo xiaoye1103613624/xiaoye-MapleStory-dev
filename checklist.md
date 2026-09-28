@@ -28,6 +28,15 @@
 - [ ] 插件改完已自动同步到客户端（或按占用策略：用户自替 / AI kill 后同步 / 中止）
 - [ ] 进程占用：首遇已询问；后续遵循用户首次（或最新）选择
 - [ ] WZ/IMG/XML：经 MCP 或项目 patch 工具
+- [ ] 客户端 UI 图（详见 [ui-photoshop.md](ui-photoshop.md)）：
+  - [ ] 已读规范；样式裁决正确（默认原生 / 参考图已问跟图）
+  - [ ] 客户端路径已解析或标注未实测；用户给过的路径已写入 `notes/client-path.md`
+  - [ ] 样板：已对照 `_native-samples/` 或已标注 v083 基线
+  - [ ] `scale` 明确（默认 1x；2x 须用户确认）；未混用
+  - [ ] 版本目录 `ui/<组件>/vN` + `manifest.md`（含目标节点路径）
+  - [ ] 先 `normal` 再派生多状态；可点态齐全；经 Photoshop MCP preview 自检
+  - [ ] §12 验收清单逐项已过；需入库则走 orange-wz（load → 写节点 → save_as → 原子替换）
+  - [ ] 接入见 [toolchain.md §7](toolchain.md#7-photoshop-mcp)
 - [ ] 跨端 / 多语言资源同步已评估
 - [ ] 道具：本地其它目录已查；缺失时已用小册子等资源站补齐或显式预留
 - [ ] 外观道具：非「仅图标」完整同步，或仅图标时已获用户确认

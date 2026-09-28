@@ -9,10 +9,12 @@ description: >-
   再制定完整开发计划并以 Plan 模式一次性规划任务；同会话未完成任务须防遗忘续作（用户叫停则停），
   插问时先提示是否继续再答新问题；插件改完自动同步客户端，占用冲突首遇询问其后按首次选择执行；
   须完整注释与分级节点日志，调试期自动开调试日志、功能完成后删除临时调试日志；
+  客户端 UI 图绘制/重绘须走 Photoshop MCP 与原生 UI 规范（默认原生、样板库、prompt 模板、normal 派生多状态、版本递增、验收入库）；
   其它语言/框架开发亦可遵循其中通用工程规范。
   Use when developing any MapleStory feature, single-player, client plugin, wz/img/xml,
-  item resources, resource sync, planning MapleStory work, or when the user mentions 冒险岛、
-  MapleStory、xiaoye-MapleStory-dev、插件修改、WZ、IMG、道具、小册子、单机版开发、开发计划。
+  item resources, resource sync, planning MapleStory work, Photoshop UI drawing, native UI,
+  or when the user mentions 冒险岛、MapleStory、xiaoye-MapleStory-dev、插件修改、WZ、IMG、
+  道具、小册子、单机版开发、开发计划、Photoshop、UI绘制、原生UI、ui-photoshop。
 ---
 
 # xiaoye-MapleStory-dev（萧曳冒险岛 · 全局）
@@ -46,6 +48,7 @@ description: >-
 13. **同会话任务续作**：同一会话中若有未完成的功能开发任务，须主动防遗忘续作；用户明确「先不做 / 暂停 / 以后再说」则**不得**擅自继续闭环；用户中途改问其它问题时，**先提示是否继续原功能**，再回答新问题。
 14. **插件改完同步客户端**：修改插件完成后须自动同步/覆盖到目标客户端目录；若客户端占用导致覆盖失败，按「插件同步与进程占用」处理（首遇询问，其后遵循用户首次选择）。
 15. **注释与分级日志**：开发须有完整必要注释与关键节点日志；日志可区分 debug / 上线；调试期自动启用调试日志，**功能闭环完成后删除临时调试日志**，仅保留上线级可观测日志（见「注释与日志」）。
+16. **客户端 UI 图走 Photoshop**：绘制 / 重绘 / 生成客户端 UI 位图必须使用 **Photoshop MCP**，并遵守 [ui-photoshop.md](ui-photoshop.md)——未指定样式则**默认原生**；用户给参考图时先问跟图还是原生（未答默认原生）；默认 **1x**（2x 须用户明确）；输出落在 `docs/features/<功能名>/ui/<组件>/vN/`；可点控件先出 `normal` 再派生其它态；用户给过的客户端路径须落盘 `notes/client-path.md`；交付前过验收清单；入库仍走 orange-wz，禁止裸拷。
 
 ## 需求受理：思考 → 抉择 → 计划（Plan）
 
@@ -117,11 +120,14 @@ description: >-
 ```text
 docs/features/<功能名>/
   README.md                 # 最终实现逻辑（必填）
-  notes/                    # 调研笔记、节点语义、版本差异表
+  notes/                    # 调研笔记、节点语义、版本差异表；含 client-path.md（客户端路径记忆）
   evidence/                 # IDA 截图/地址笔记、封包样例、MCP 查询摘要（脱敏）
   patches/                  # diff、xml.diff、补丁脚本、dry-run 日志
   builds/                   # 本次构建产物索引（jar/hash、前端 dist 说明）；大文件可只留校验和与路径
   resources/                # 本功能新增/修改的资源清单（路径列表，不必复制整包 WZ）
+  ui/<组件名>/v1|v2|v3.../  # 客户端 UI 图版本目录（PNG + manifest.md）；见 ui-photoshop.md
+
+docs/features/_native-samples/  # 跨功能原生 UI 样板库（色板/尺寸/核心窗体 PNG）；见 ui-photoshop.md §4
 ```
 
 保留原则：
@@ -140,7 +146,7 @@ Task Progress:
 - [ ] 1. 全面思考；列出决策/不确定点 → 用户抉择（阻塞）
 - [ ] 2. Plan 模式：一次性完整开发计划 → 用户确认
 - [ ] 3. 按计划实现：代码 / 脚本 / 配置 / 资源 / i18n
-- [ ] 4. 特殊路径：插件→IDA；WZ/IMG/XML→MCP；跨版本→密钥/编码/兼容
+- [ ] 4. 特殊路径：插件→IDA；WZ/IMG/XML→MCP；UI 图→Photoshop MCP（ui-photoshop）；跨版本→密钥/编码/兼容
 - [ ] 5. 验证：单测 + 构建/打包
 - [ ] 6. 产物归档 + 最终实现逻辑文档
 - [ ] 7. 清理临时调试日志；保留上线级节点日志与完整注释
@@ -157,7 +163,7 @@ Task Progress:
 | 资源暂缺 / 某版本客户端未齐 | **预留**并写清接口 |
 | 仅本功能路径可闭环 | 直接闭环 + 产物归档 |
 
-**工具链就绪（开工前）**：先确认本需求所需环境与工具齐备（如 JDK 21、MySQL 8、Maven、Node/Yarn、VS2019、IDA Pro + `ida-pro-mcp`、`orange-wz` MCP、MySQL 启停工具）。缺工具时先补齐，或向用户说明阻塞并**显式预留**，禁止在缺工具状态下假装闭环；获取与接入见 [toolchain.md](toolchain.md)。
+**工具链就绪（开工前）**：先确认本需求所需环境与工具齐备（如 JDK 21、MySQL 8、Maven、Node/Yarn、VS2019、IDA Pro + `ida-pro-mcp`、`orange-wz` MCP、Photoshop MCP、MySQL 启停工具）。缺工具时先补齐，或向用户说明阻塞并**显式预留**，禁止在缺工具状态下假装闭环；获取与接入见 [toolchain.md](toolchain.md)。涉及 UI 出图时另遵 [ui-photoshop.md](ui-photoshop.md)。
 
 ## 分层规范（通用 + 项目适配）
 
@@ -255,6 +261,7 @@ Task Progress:
 | --- | --- |
 | 插件/二进制校准 | `user-ida-pro-mcp`（先读 schema） |
 | WZ/IMG/XML / 密钥 | `user-orange-wz` 等（先读 schema） |
+| 客户端 UI 位图绘制 / 重绘 / 生成 | `user-photoshop`（先读 schema；规范见 [ui-photoshop.md](ui-photoshop.md)） |
 | 项目自带 patch 器 | 以该仓库文档为准 |
 
 - 写前先查；跨版本换密钥用专用转换，不猜 IV/userKey。
@@ -264,6 +271,7 @@ Task Progress:
 
 - **IDA MCP（ida-pro-mcp）**：需 IDA Pro 8.3+（推荐 9；Free 不支持）+ Python 3.11+ + uv + 激活 idalib；通用 MCP 客户端用 `ida-pro-mcp --config` 生成配置接入；headless 模式**每次调用须显式带 `database`**；进制转换一律用 `int_convert`，不自行换算。
 - **orange-wz MCP**：用 `ensure-mcp` 启动，端口 **10012–10029 自动顺延**；实际端点按 `mcp-runtime/endpoint.json` → `active-port.txt` → 回退 `http://127.0.0.1:10012/mcp` 解析；改 live `.img` 前先关客户端，**禁止 `save_as` 回写 loaded 根**，落盘用「另存 → 原子替换」。
+- **Photoshop MCP**：接入与路径见 [toolchain.md §7](toolchain.md#7-photoshop-mcp)（`~/.cursor/mcp.json` 的 `photoshop` / 工具侧 `user-photoshop`）；会话首次 `photoshop_ping`；出图前读 [ui-photoshop.md](ui-photoshop.md) 交互剧本、prompt 模板与状态派生；样式裁决 → 样板/路径 → 先 `normal` 再派生多状态 → preview 验收 → `vN` 导出；入库仍走 orange-wz。
 - 各工具的获取、构建、启动与客户端配置细节见 [toolchain.md](toolchain.md)。
 
 ## 验证门禁（按改动范围）
@@ -275,6 +283,7 @@ Task Progress:
 | 协议/存档/启停 | 补充回归说明（登录、进服、存档等） |
 | WZ/资源 | verify / dry-run / 抽样节点 |
 | 插件 | IDA 校对 + 客户端验证步骤说明 |
+| 客户端 UI 图 | 按 ui-photoshop §12 验收清单：样式、尺寸/scale、多状态、禁区观感、样板并排、版本目录；入库则抽样节点 |
 
 环境缺失（如无 DB）导致测试无法跑时：如实记录，至少保证编译/打包，并列出未跑项。
 
@@ -300,6 +309,7 @@ Task Progress:
 - [ ] 插件已同步至客户端（占用冲突已按用户策略处理）
 - [ ] 跨端/跨版本同步已评估
 - [ ] 道具资源完整（或外观仅图标等情形已获用户确认并预留）
+- [ ] 若涉及客户端 UI 图：已按 [ui-photoshop.md](ui-photoshop.md) 走完交互剧本（样板/路径记忆、1x 默认、normal→派生、§12 验收）；版本目录 + manifest（含目标节点路径）齐全；需入库则已走 orange-wz
 - [ ] **产物已归档**（文档 + evidence/patches/清单）
 - [ ] 最终实现逻辑文档已补
 - [ ] 原子提交（若需要）
@@ -319,4 +329,5 @@ Task Progress:
 
 - [feature-doc-template.md](feature-doc-template.md)
 - [checklist.md](checklist.md)
-- [toolchain.md](toolchain.md) — 配套工具链集成（服务端 / 客户端 / 插件 / IDA MCP / orange-wz MCP / MySQL 启停工具）
+- [toolchain.md](toolchain.md) — 配套工具链集成（服务端 / 客户端 / 插件 / IDA MCP / orange-wz MCP / Photoshop MCP / MySQL 启停工具）
+- [ui-photoshop.md](ui-photoshop.md) — 客户端 UI 绘制规范（交互剧本、样板库、prompt 模板、状态派生、验收与入库）；接入见 [toolchain.md §7](toolchain.md#7-photoshop-mcp)
