@@ -19,11 +19,12 @@
 | 让 AI 能读 IDA | [5. IDA MCP（ida-pro-mcp）](#5-ida-mcpida-pro-mcp) |
 | 让 AI 能改 WZ/IMG | [6. orange-wz（资源修改器 + MCP）](#6-orange-wz资源修改器--mcp) |
 | 让 AI 能画客户端 UI | [7. Photoshop MCP](#7-photoshop-mcp) |
-| 启停 MySQL | [8. NapMysqlTool](#8-napmysqltool) |
-| 接入 MCP 客户端 | [9. MCP 客户端配置模板](#9-mcp-客户端配置模板) |
-| 按顺序启动整套环境 | [10. 推荐启动顺序](#10-推荐启动顺序) |
-| 一次性就绪检查 | [11. 工具链就绪检查清单](#11-工具链就绪检查清单) |
-| 排障 | [12. 常见故障排查](#12-常见故障排查) |
+| 让 AI 查 / 看数据库 | [8. dbx（数据库可视化 + MCP）](#8-dbx数据库可视化--mcp) |
+| 启停 MySQL | [9. NapMysqlTool](#9-napmysqltool) |
+| 接入 MCP 客户端 | [10. MCP 客户端配置模板](#10-mcp-客户端配置模板) |
+| 按顺序启动整套环境 | [11. 推荐启动顺序](#11-推荐启动顺序) |
+| 一次性就绪检查 | [12. 工具链就绪检查清单](#12-工具链就绪检查清单) |
+| 排障 | [13. 常见故障排查](#13-常见故障排查) |
 
 ---
 
@@ -38,13 +39,14 @@
 | Visual Studio | **2019** + Windows SDK 10 + 工具集 **v142** | 插件 BeiDou-ijl15 |
 | IDA Pro | **8.3+（推荐 9）**，**IDA Free 不支持** | IDA MCP 逆向校准 |
 | Adobe Photoshop | 本机已安装（示例：Photoshop 2024） | Photoshop MCP 出图 |
-| Node.js | **v20.15.0 LTS**（`npx` 可用） | `gms-ui`；Cursor 侧 Photoshop MCP（`npx @alisaitteke/photoshop-mcp`） |
+| Node.js | **v20.15.0 LTS**（`npx` 可用） | `gms-ui`；Cursor 侧 Photoshop MCP（`npx @alisaitteke/photoshop-mcp`）；dbx MCP（`npx @dbx-app/mcp-server`） |
 | Python | **3.11+** | ida-pro-mcp；部分环境的 photoshop-mcp-server |
 | uv | 最新版 | ida-pro-mcp / idalib |
 | Git | 任意 | 拉取源码 |
+| dbx（可选） | 最新桌面端 | 数据库可视化 + MCP；仅在用户同意集成时安装 |
 
 > 提示：服务端与 orange-wz 都要求 **Java 21**；若系统默认 Java 为 1.8，请单独安装 21 并在启动脚本里显式指定 `java.exe` 路径。  
-> Node 在环境表中既服务 `gms-ui`，也服务 Cursor 的 Photoshop MCP（stdio + `npx`）；勿重复安装冲突版本。
+> Node 在环境表中既服务 `gms-ui`，也服务 Cursor 的 Photoshop MCP / dbx MCP（stdio + `npx`）；勿重复安装冲突版本。
 
 ---
 
@@ -58,7 +60,8 @@
 | 4 | IDA MCP | 让 AI 读 / 改 IDA Pro 的 MCP 服务 | https://github.com/mrexodia/ida-pro-mcp | SSE **8744** / headless **8745**（本机 Cursor 配置也可能是 HTTP 其它端口） |
 | 5 | orange-wz | WZ / IMG 资源编辑器 **+ MCP 服务** | https://github.com/gujichu/orange-wz | HTTP MCP **10012–10029** |
 | 6 | Photoshop MCP | 让 AI 驱动 Adobe Photoshop 绘制 / 生成客户端 UI 图 | npm：`@alisaitteke/photoshop-mcp`（Cursor）；或本机 `photoshop-mcp-server`（CodeBuddy 等） | **stdio**（无固定端口）；Cursor 工具侧标识常为 `user-photoshop` |
-| 7 | NapMysqlTool | 图形化 MySQL 启停 / 多实例管理 | https://github.com/SleepNap/NapMysqlTool | Windows GUI |
+| 7 | dbx | 数据库可视化客户端 **+ MCP**（查表 / 执行 SQL；须用户同意后接入） | https://github.com/t8y2/dbx | **stdio**（`npx @dbx-app/mcp-server`）；权限在 DBX「设置 → MCP」 |
+| 8 | NapMysqlTool | 图形化 MySQL 启停 / 多实例管理 | https://github.com/SleepNap/NapMysqlTool | Windows GUI |
 
 **客户端下载地址**：服务端 Releases 页 `https://github.com/BeiDouMS/BeiDou-Server/releases`
 （该页同时发布服务端包与客户端包；客户端命名形如 `BeiDou-ClientV17.7z`）。
@@ -93,7 +96,7 @@
 
 ### 2.3 启动与端口
 
-1. 先确保 **MySQL 已启动**（可用 [NapMysqlTool](#7-napmysqltool)）。
+1. 先确保 **MySQL 已启动**（可用 [NapMysqlTool](#9-napmysqltool)）。
 2. 启动服务端：首次启动会**自动建库并执行初始化 SQL**，只需保证数据库可达。
 3. 关键端口：
 
@@ -234,7 +237,7 @@ ida-pro-mcp --install
   ```bash
   ida-pro-mcp --config
   ```
-  得到 JSON 配置后，手动粘贴到对应客户端的 MCP 配置中（见 [第 8 节](#8-mcp-客户端配置模板)）。
+  得到 JSON 配置后，手动粘贴到对应客户端的 MCP 配置中（见 [第 10 节](#10-mcp-客户端配置模板)）。
 
 ### 5.4 运行方式
 
@@ -444,15 +447,123 @@ Photoshop MCP 在本机为 **stdio**（`command` + `args`），**不是** HTTP �
 
 ---
 
-## 8. NapMysqlTool
+## 8. dbx（数据库可视化 + MCP）
+
+**定位**：轻量跨平台数据库客户端（[t8y2/dbx](https://github.com/t8y2/dbx)），支持 MySQL 等 100+ 数据源；提供独立 **MCP Server**，让 AI 经已配置的连接查表 / 执行 SQL。官方说明：[MCP 集成文档](https://dbxio.com/cn/docs/mcp)。
+
+> **Skill 门禁（必读）**：未获用户同意前，禁止安装 / 注入 dbx、禁止连库写操作。完整交互剧本见 [SKILL.md「数据库操作与 dbx MCP」](SKILL.md#数据库操作与-dbx-mcp)。摘要：先问「集成 dbx / 自备 DB MCP / 暂不碰库」→ 同意集成后再问「AI 协助下载 / 用户自下」→ 装完后**自动**写入全局 `~/.cursor/mcp.json` → 默认只读，DDL/DML 须另获明确同意。
+
+### 8.1 前置条件
+
+| 项 | 要求 |
+| --- | --- |
+| 用户同意 | 本会话已明确选择「集成 dbx」（选项 A） |
+| Node.js + `npx` | Cursor 用 `npx @dbx-app/mcp-server` 时需要（与 Photoshop MCP 共用 Node） |
+| 或原生 MCP 二进制 | 可选：官方 `install-mcp` 脚本装到 `~/.dbx/bin`（见下） |
+| MySQL 8 等目标库 | 服务端库已启动且账号可用（可用 [§9 NapMysqlTool](#9-napmysqltool)） |
+| DBX 桌面端 | 至少完成一次连接配置；MCP 权限在「设置 → MCP」管理 |
+
+### 8.2 获取桌面端（下载）
+
+官方入口：[Releases](https://github.com/t8y2/dbx/releases/latest) / 仓库 README「安装」。
+
+| 平台 | 方式 |
+| --- | --- |
+| Windows | `winget install t8y2.dbx`；或 Scoop：`scoop bucket add dbx https://github.com/t8y2/scoop-bucket` → `scoop install dbx`；或下载 Releases 安装包 / 便携版 |
+| macOS | `brew install --cask dbx` |
+| Linux | Flatpak 等（见官方 README） |
+
+安装后：在 DBX 中添加本机 MySQL 连接（服务端库），并到 **设置 → MCP** 配置连接 allowlist；建议默认 **只读（`read_only`）**。档位机器可读值：`read_only` / `safe_write` / `high_risk_write`。
+
+### 8.3 接入 MCP（写入全局 Cursor 配置）
+
+MCP Server **独立于**桌面端分发；装桌面端不会自动带上 MCP 可执行文件。用户同意集成且桌面端就绪后，AI 须把下列片段**合并注入**全局配置（勿覆盖其它已有 server）：
+
+| 用途 | 路径 |
+| --- | --- |
+| Cursor 全局（首选） | `~/.cursor/mcp.json`（即 `%USERPROFILE%\.cursor\mcp.json`） |
+| CodeBuddy（若使用） | `~/.codebuddy/mcp.json` |
+| 配置内 server 键名 | `dbx` |
+
+#### 推荐（npx，与官方 README 一致）
+
+```json
+{
+  "mcpServers": {
+    "dbx": {
+      "command": "npx",
+      "args": ["-y", "@dbx-app/mcp-server"]
+    }
+  }
+}
+```
+
+#### Windows 便携版（须设数据目录）
+
+便携版请将 `DBX_DATA_DIR` 指向 `DBX.exe` 同级的 `data` 目录（含 `dbx.db` 的文件夹）：
+
+```json
+{
+  "mcpServers": {
+    "dbx": {
+      "command": "npx",
+      "args": ["-y", "@dbx-app/mcp-server"],
+      "env": {
+        "DBX_DATA_DIR": "D:\\path\\to\\DBX\\data"
+      }
+    }
+  }
+}
+```
+
+#### 可选：原生 MCP 安装（无需长期依赖 npx）
+
+```powershell
+# Windows
+irm https://dbxio.com/install-mcp.ps1 | iex
+```
+
+```bash
+# macOS / Linux
+curl -fsSL https://dbxio.com/install-mcp | sh
+```
+
+脚本将二进制装到 `~/.dbx/bin` 并打印各客户端配置；GUI 客户端请使用输出中的**绝对路径**（不要写 `~` 或裸命令 `dbx-mcp`）。亦可用 `brew install t8y2/tap/dbx-mcp`。
+
+#### DBX Web / Docker
+
+若连的是 Web 后端，在 `env` 中设置 `DBX_WEB_URL`（及必要时 `DBX_WEB_PASSWORD`），见[官方 MCP 文档](https://dbxio.com/cn/docs/mcp)。
+
+注入后：提示用户**重载 MCP / 重启 Cursor**；调用前读工作区 `mcps/` 下 dbx 工具 schema（若已出现）。
+
+> 权限与连接范围以 **DBX 设置 → MCP** 为准；客户端 `mcp.json` 通常不必再写权限环境变量。旧变量 `DBX_MCP_ALLOW_WRITES=0` 仅在中央策略首次保存前作为只读限制，**不能**用来开启写入。
+
+### 8.4 与 skill 的集成方式
+
+- 触发与询问剧本、下载协助 vs 自下、全局注入、硬安全禁写：见 [SKILL.md](SKILL.md)「数据库操作与 dbx MCP」与门禁 17。
+- **工具能力 ≠ 授权**：即使 DBX 侧已是 `safe_write` / `high_risk_write`，AI 仍须对本次 DDL/DML 取得用户明确同意。
+- 用户选「自备数据库 MCP」时：不安装 dbx；等用户启用后按其 schema 调用，同样遵守只读默认。
+- 查询摘要可写入产物 `evidence/`，须脱敏。
+
+### 8.5 校验点
+
+- [ ] 用户已同意集成 dbx（或已明确使用自备 DB MCP）
+- [ ] DBX 桌面端已安装，且已配置目标库连接
+- [ ] DBX「设置 → MCP」allowlist / 档位符合预期（建议默认只读）
+- [ ] `~/.cursor/mcp.json` 存在 `dbx` 项（npx 或原生绝对路径）
+- [ ] 重载后 Agent 可见 dbx 相关工具；能列出连接或执行只读 `SELECT 1`
+
+---
+
+## 9. NapMysqlTool
 
 **定位**：Windows 图形化 MySQL **启停 / 多实例管理**工具（含导入导出、异常关机「修复」功能，MIT）。
 
-### 8.1 获取
+### 9.1 获取
 
 到 [Releases](https://github.com/SleepNap/NapMysqlTool/releases) 下载**完整包**（默认分支 3.x）。
 
-### 8.2 运行前提（缺一不可）
+### 9.2 运行前提（缺一不可）
 
 必须保留下述完整结构，**只下载 `NapMysqlTool.exe` 会启动失败**：
 
@@ -466,12 +577,12 @@ Photoshop MCP 在本机为 **stdio**（`command` + `args`），**不是** HTTP �
 
 双击 `NapMysqlTool.exe` 即可，UI 中按实例启动 / 停止。
 
-### 8.3 注意事项
+### 9.3 注意事项
 
 - 若机器上已有 MySQL 注册为开机自启服务并占用 **3306**，需先关闭该服务自启。
 - 异常关机导致 MySQL 起不来时，用「扩展功能 → 修复」。
 
-### 8.4 校验点
+### 9.4 校验点
 
 - [ ] 完整包齐全（五个部分都在同一目录）
 - [ ] 3306 无冲突
@@ -479,11 +590,11 @@ Photoshop MCP 在本机为 **stdio**（`command` + `args`），**不是** HTTP �
 
 ---
 
-## 9. MCP 客户端配置模板
+## 10. MCP 客户端配置模板
 
-以下为通用 `mcpServers` 片段，按客户端写入对应配置文件。可与第 5–7 节各工具配置合并为同一文件。
+以下为通用 `mcpServers` 片段，按客户端写入对应配置文件。可与第 5–8 节各工具配置合并为同一文件。
 
-### 9.1 CodeBuddy
+### 10.1 CodeBuddy
 
 文件：`~/.codebuddy/mcp.json`
 
@@ -498,18 +609,22 @@ Photoshop MCP 在本机为 **stdio**（`command` + `args`），**不是** HTTP �
       "command": "C:\\Users\\<你>\\AppData\\Local\\Programs\\Python\\Python314\\Scripts\\photoshop-mcp-server.exe",
       "args": [],
       "env": {}
+    },
+    "dbx": {
+      "command": "npx",
+      "args": ["-y", "@dbx-app/mcp-server"]
     }
   }
 }
 ```
 
-> `photoshop` 的 `command` 以本机实际 exe 为准（见 [7.3](#73-接入方式stdio)）。
+> `photoshop` 的 `command` 以本机实际 exe 为准（见 [7.3](#73-接入方式stdio)）。`dbx` 仅在用户同意集成后写入；便携版加 `DBX_DATA_DIR`（见 [8.3](#83-接入-mcp写入全局-cursor-配置)）。
 
-### 9.2 Cursor
+### 10.2 Cursor
 
 文件：`~/.cursor/mcp.json`
 
-本机完整结构示例（含 orange-wz / IDA / Photoshop；端口与路径请按本机改）：
+本机完整结构示例（含 orange-wz / IDA / Photoshop / dbx；端口与路径请按本机改；`dbx` 仅在用户同意后添加）：
 
 ```json
 {
@@ -529,28 +644,32 @@ Photoshop MCP 在本机为 **stdio**（`command` + `args`），**不是** HTTP �
         "LOG_LEVEL": "1",
         "PHOTOSHOP_PATH": "D:\\software\\Photoshop 25.12.4\\Adobe Photoshop 2024\\Photoshop.exe"
       }
+    },
+    "dbx": {
+      "command": "npx",
+      "args": ["-y", "@dbx-app/mcp-server"]
     }
   }
 }
 ```
 
-### 9.3 Claude Code
+### 10.3 Claude Code
 
 ```bash
 claude mcp add --transport http orange-wz http://127.0.0.1:10012/mcp
 ```
 
-Photoshop 若用 stdio，按 Claude Code 文档用 `command`/`args` 方式添加，勿硬套 HTTP。
+Photoshop / dbx 若用 stdio，按 Claude Code 文档用 `command`/`args` 方式添加，勿硬套 HTTP。dbx 示例：`claude mcp add --transport stdio dbx -- npx -y @dbx-app/mcp-server`（以当前 Claude Code 文档为准）。
 
-### 9.4 IDA MCP 配置
+### 10.4 IDA MCP 配置
 
 通用客户端执行 `ida-pro-mcp --config` 生成，再把输出片段并入上面的 `mcpServers`。本机 Cursor 也可能已是 HTTP 形式（如 `http://127.0.0.1:13337/mcp`）。
 
-> ⚠️ orange-wz 的 `url` 端口请以 `mcp-runtime/endpoint.json` 为准，上例 10012 仅为默认回退值。Photoshop 为 stdio，无 url 端口。
+> ⚠️ orange-wz 的 `url` 端口请以 `mcp-runtime/endpoint.json` 为准，上例 10012 仅为默认回退值。Photoshop / dbx 为 stdio，无 url 端口。
 
 ---
 
-## 10. 推荐启动顺序
+## 11. 推荐启动顺序
 
 ```text
 1. 启动 MySQL（NapMysqlTool 或系统服务），确认 3306 可用、MySQL 8
@@ -558,29 +677,31 @@ Photoshop 若用 stdio，按 Claude Code 文档用 `command`/`args` 方式添加
 3. 启动 orange-wz MCP（ensure-mcp），确认 endpoint.json 端口可用
 4. 启动 IDA（如需逆向），确认 ida-pro-mcp 已装载到 MCP 客户端
 5. 需画客户端 UI 时：启动 Adobe Photoshop，确认 photoshop MCP 已加载（Cursor：user-photoshop）
-6. 启动游戏客户端，指向本地服务端
-7. 在 AI 客户端中确认 MCP 工具列表齐全（含 photoshop_*）
+6. 需查 / 验库内数据时：确认用户已抉择通道；若用 dbx，启动 DBX 桌面端并确认 mcp.json 已注入 dbx
+7. 启动游戏客户端，指向本地服务端
+8. 在 AI 客户端中确认 MCP 工具列表齐全（含 photoshop_*；若已接入则含 dbx）
 ```
 
 ---
 
-## 11. 工具链就绪检查清单
+## 12. 工具链就绪检查清单
 
 - [ ] JDK 21 可用（服务端 / orange-wz）
 - [ ] Maven 可用
 - [ ] MySQL 8 已启动（NapMysqlTool 完整包可用）
-- [ ] Node v20.15.0 + Yarn（如需 `gms-ui`）；Cursor Photoshop MCP 时 `npx` 可用
+- [ ] Node v20.15.0 + Yarn（如需 `gms-ui`）；Cursor Photoshop / dbx MCP 时 `npx` 可用
 - [ ] Visual Studio 2019 + SDK10 + v142（如需编译插件）
 - [ ] IDA Pro 8.3+/9 + Python 3.11+ + uv + idalib 已激活（如需逆向）
 - [ ] `ida-pro-mcp` 已接入，且 MCP 客户端已装载
 - [ ] orange-wz 已构建，`ensure-mcp` 返回 OK，端点已写入 MCP 客户端配置
 - [ ] Adobe Photoshop 可启动；`~/.cursor/mcp.json`（或 CodeBuddy）中 `photoshop` 配置正确；`photoshop_ping` 可用
+- [ ] （可选）用户已同意并接入 dbx：桌面端已连目标库；`mcp.json` 有 `dbx`；DBX「设置 → MCP」为预期档位（建议只读）
 - [ ] 服务端 8484 / API 8686 可达
 - [ ] 客户端可启动并连接本地服务端
 
 ---
 
-## 12. 常见故障排查
+## 13. 常见故障排查
 
 | 现象 | 可能原因 | 处理 |
 | --- | --- | --- |
@@ -600,12 +721,18 @@ Photoshop 若用 stdio，按 Claude Code 文档用 `command`/`args` 方式添加
 | `npx` 拉包失败 | 无 Node / 网络受限 | 安装 Node LTS；必要时配置 npm 镜像后再试 |
 | CodeBuddy 与 Cursor 行为不一致 | 两边 MCP 实现不同 | 分别读各自 `mcp.json`，勿混用 command 路径 |
 | 生成图不像原生 | 未遵 UI 规范 | 按 [ui-photoshop.md](ui-photoshop.md) 用模板约束 prompt、先 normal 再派生、对照样板与 §12 验收 |
+| dbx 工具列表看不到 | 未注入 / 未重载 / 用户未同意 | 确认用户已选集成 dbx；检查 `~/.cursor/mcp.json` 的 `dbx`；重载 MCP |
+| dbx 无连接 / 查不到库 | 桌面端未配连接或 allowlist 未放行 | 在 DBX 添加连接；「设置 → MCP」放行该连接 |
+| Windows 便携版 MCP 读不到数据 | 未设 `DBX_DATA_DIR` | 指向 `DBX.exe` 同级 `data` 目录（含 `dbx.db`） |
+| AI 拒绝执行 INSERT/UPDATE 等 | skill 硬安全门禁 | 须用户明确同意本次 DDL/DML；「查一下」不等于写库授权 |
 
 ---
 
 ## 延伸阅读
 
-- [SKILL.md](SKILL.md) — 开发规范主体（门禁 / 计划 / 闭环）
+- [SKILL.md](SKILL.md) — 开发规范主体（门禁 / 计划 / 闭环 / 数据库操作与 dbx MCP）
 - [checklist.md](checklist.md) — 交付检查清单
 - [feature-doc-template.md](feature-doc-template.md) — 功能实现逻辑文档模板
 - [ui-photoshop.md](ui-photoshop.md) — 客户端 UI 绘制规范（交互剧本 / 样板 / 模板 / 状态派生 / 验收入库）
+- [t8y2/dbx](https://github.com/t8y2/dbx) — dbx 仓库与官方 MCP 说明
+- [DBX MCP 文档](https://dbxio.com/cn/docs/mcp) — 安装与客户端配置

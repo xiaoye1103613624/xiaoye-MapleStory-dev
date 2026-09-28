@@ -10,11 +10,13 @@ description: >-
   插问时先提示是否继续再答新问题；插件改完自动同步客户端，占用冲突首遇询问其后按首次选择执行；
   须完整注释与分级节点日志，调试期自动开调试日志、功能完成后删除临时调试日志；
   客户端 UI 图绘制/重绘须走 Photoshop MCP 与原生 UI 规范（默认原生、样板库、prompt 模板、normal 派生多状态、版本递增、验收入库）；
+  需直接操作数据库或全流程校验含库内数据时，须先询问集成 dbx 或用户自备数据库 MCP；无用户同意禁止 DDL/DML（仅允许查询）；
   其它语言/框架开发亦可遵循其中通用工程规范。
   Use when developing any MapleStory feature, single-player, client plugin, wz/img/xml,
   item resources, resource sync, planning MapleStory work, Photoshop UI drawing, native UI,
-  or when the user mentions 冒险岛、MapleStory、xiaoye-MapleStory-dev、插件修改、WZ、IMG、
-  道具、小册子、单机版开发、开发计划、Photoshop、UI绘制、原生UI、ui-photoshop。
+  database ops, dbx MCP, or when the user mentions 冒险岛、MapleStory、xiaoye-MapleStory-dev、
+  插件修改、WZ、IMG、道具、小册子、单机版开发、开发计划、Photoshop、UI绘制、原生UI、
+  ui-photoshop、数据库、dbx、MySQL。
 ---
 
 # xiaoye-MapleStory-dev（萧曳冒险岛 · 全局）
@@ -49,6 +51,7 @@ description: >-
 14. **插件改完同步客户端**：修改插件完成后须自动同步/覆盖到目标客户端目录；若客户端占用导致覆盖失败，按「插件同步与进程占用」处理（首遇询问，其后遵循用户首次选择）。
 15. **注释与分级日志**：开发须有完整必要注释与关键节点日志；日志可区分 debug / 上线；调试期自动启用调试日志，**功能闭环完成后删除临时调试日志**，仅保留上线级可观测日志（见「注释与日志」）。
 16. **客户端 UI 图走 Photoshop**：绘制 / 重绘 / 生成客户端 UI 位图必须使用 **Photoshop MCP**，并遵守 [ui-photoshop.md](ui-photoshop.md)——未指定样式则**默认原生**；用户给参考图时先问跟图还是原生（未答默认原生）；默认 **1x**（2x 须用户明确）；输出落在 `docs/features/<功能名>/ui/<组件>/vN/`；可点控件先出 `normal` 再派生其它态；用户给过的客户端路径须落盘 `notes/client-path.md`；交付前过验收清单；入库仍走 orange-wz，禁止裸拷。
+17. **数据库操作先问再接、无同意禁写**：当 AI 需要**直接操作数据库**，或全流程验证 / 查询 / 更新涉及**库内数据**时，须先询问用户选用 [dbx](https://github.com/t8y2/dbx) 集成，或由用户自行提供 / 启用已有数据库 MCP（见「数据库操作与 dbx MCP」）。**未经用户明确同意，禁止任何 DDL / DML**（`INSERT` / `UPDATE` / `DELETE` / `CREATE` / `ALTER` / `DROP` / `TRUNCATE` / `REPLACE` / `MERGE` 等），仅允许**查询（SELECT / 只读）**。
 
 ## 需求受理：思考 → 抉择 → 计划（Plan）
 
@@ -70,6 +73,7 @@ description: >-
 | 兼容 | 是否兼容旧号、是否同步多语言/多端目录 |
 | 风险 | 是否允许改已有玩法、是否需要配置开关 |
 | 交付 | 是否自动提交、产物放哪、文档粒度 |
+| 数据库 | 是否直接碰库 / 全流程含库内数据：集成 **dbx**，或用户自备数据库 MCP；若需写库是否明确授权 DDL/DML |
 
 无决策点时，简短说明「无待决项」并直接进入阶段 2。
 
@@ -146,7 +150,7 @@ Task Progress:
 - [ ] 1. 全面思考；列出决策/不确定点 → 用户抉择（阻塞）
 - [ ] 2. Plan 模式：一次性完整开发计划 → 用户确认
 - [ ] 3. 按计划实现：代码 / 脚本 / 配置 / 资源 / i18n
-- [ ] 4. 特殊路径：插件→IDA；WZ/IMG/XML→MCP；UI 图→Photoshop MCP（ui-photoshop）；跨版本→密钥/编码/兼容
+- [ ] 4. 特殊路径：插件→IDA；WZ/IMG/XML→MCP；UI 图→Photoshop MCP（ui-photoshop）；库内数据→先问 dbx / 自备 DB MCP（默认可读禁写）；跨版本→密钥/编码/兼容
 - [ ] 5. 验证：单测 + 构建/打包
 - [ ] 6. 产物归档 + 最终实现逻辑文档
 - [ ] 7. 清理临时调试日志；保留上线级节点日志与完整注释
@@ -160,10 +164,12 @@ Task Progress:
 | --- | --- |
 | 公共 API / 存档 / 协议 opcode / 全局数值倍率 | **先问用户** |
 | 会改已有玩法行为（非本需求） | **先问用户** |
+| 直接操作数据库 / 全流程校验含库内数据 | **先问用户**：集成 dbx，或用户自备数据库 MCP（见「数据库操作与 dbx MCP」） |
+| 需要对库执行 DDL / DML（非只读查询） | **先问用户并获明确同意**；未同意则仅 SELECT / 只读 |
 | 资源暂缺 / 某版本客户端未齐 | **预留**并写清接口 |
 | 仅本功能路径可闭环 | 直接闭环 + 产物归档 |
 
-**工具链就绪（开工前）**：先确认本需求所需环境与工具齐备（如 JDK 21、MySQL 8、Maven、Node/Yarn、VS2019、IDA Pro + `ida-pro-mcp`、`orange-wz` MCP、Photoshop MCP、MySQL 启停工具）。缺工具时先补齐，或向用户说明阻塞并**显式预留**，禁止在缺工具状态下假装闭环；获取与接入见 [toolchain.md](toolchain.md)。涉及 UI 出图时另遵 [ui-photoshop.md](ui-photoshop.md)。
+**工具链就绪（开工前）**：先确认本需求所需环境与工具齐备（如 JDK 21、MySQL 8、Maven、Node/Yarn、VS2019、IDA Pro + `ida-pro-mcp`、`orange-wz` MCP、Photoshop MCP、dbx / 数据库 MCP、MySQL 启停工具）。缺工具时先补齐，或向用户说明阻塞并**显式预留**，禁止在缺工具状态下假装闭环；获取与接入见 [toolchain.md](toolchain.md)。涉及 UI 出图时另遵 [ui-photoshop.md](ui-photoshop.md)；涉及库操作时另遵下文「数据库操作与 dbx MCP」。
 
 ## 分层规范（通用 + 项目适配）
 
@@ -262,16 +268,69 @@ Task Progress:
 | 插件/二进制校准 | `user-ida-pro-mcp`（先读 schema） |
 | WZ/IMG/XML / 密钥 | `user-orange-wz` 等（先读 schema） |
 | 客户端 UI 位图绘制 / 重绘 / 生成 | `user-photoshop`（先读 schema；规范见 [ui-photoshop.md](ui-photoshop.md)） |
+| 数据库查询 / 可视化（经用户同意接入） | `dbx`（[t8y2/dbx](https://github.com/t8y2/dbx)；先读 schema；或用户自备数据库 MCP） |
 | 项目自带 patch 器 | 以该仓库文档为准 |
 
 - 写前先查；跨版本换密钥用专用转换，不猜 IV/userKey。
 - 优化工具源码：高并发、高效率、低占用；正确性 > 速度；可测可回退。
+- **库操作安全**：默认只读；DDL/DML 须用户明确同意（门禁 17）。
+
+### 数据库操作与 dbx MCP
+
+仓库：[t8y2/dbx](https://github.com/t8y2/dbx)（轻量跨平台数据库客户端，内置 MCP）。接入细节见 [toolchain.md §8](toolchain.md#8-dbx数据库可视化--mcp)。
+
+#### 何时必须先问用户（阻塞）
+
+出现下列任一情形时，**禁止直接连库或擅自改 `mcp.json`**，须先停下来询问：
+
+1. AI 需要**直接操作数据库**（经 MCP / CLI / 客户端执行 SQL 或浏览改写库内数据）；
+2. 全流程验证、联调、验收中包含对**库内数据**的查询或更新确认。
+
+询问选项（清晰给出，等用户抉择）：
+
+| 选项 | 含义 |
+| --- | --- |
+| **A. 集成 dbx** | 使用本规范推荐的 [dbx](https://github.com/t8y2/dbx)，由 AI 按下文完成下载协助（若用户同意）与全局 Cursor MCP 注入 |
+| **B. 用户自备数据库 MCP** | 用户自行运行 / 启用已有数据库 MCP（任意厂商或自建）；AI **不得**擅自安装 dbx，仅在用户告知可用后按该 MCP 的 schema 调用 |
+| **C. 暂不碰库** | 本版用代码侧 mock / 日志 / 显式预留验收，把库内验证记为阻塞或后续项 |
+
+话术示例：
+
+> 本任务需要直接访问数据库（或全流程校验含库内数据）。请选择：  
+> **A.** 集成 [dbx](https://github.com/t8y2/dbx)（推荐）；**B.** 你自行提供 / 启用已有数据库 MCP；**C.** 本版先不碰库。
+
+同一会话内用户已明确选过 A/B/C 的，后续同类需求**不再重复追问通道**；但若要从只读升级到写库，仍须**单独**取得 DDL/DML 同意。
+
+#### 用户同意集成 dbx 之后
+
+1. **再问下载方式**（阻塞）：
+   - **AI 协助下载 / 安装**：按 [toolchain.md §8](toolchain.md#8-dbx数据库可视化--mcp) 协助获取桌面端（Releases / Scoop / WinGet 等）并提示用户完成安装与首次连接配置；
+   - **用户自行下载**：只给出官方链接与安装要点，等用户回复「已装好」再继续。
+2. **安装完成后自动集成 MCP**：将 dbx MCP 写入**全局** Cursor 配置 `~/.cursor/mcp.json`（`mcpServers.dbx`），配置内容遵循官方文档（推荐 `npx -y @dbx-app/mcp-server`；Windows 便携版须设 `DBX_DATA_DIR`）。可同时写入 `~/.codebuddy/mcp.json`（若用户使用 CodeBuddy）。改完后提示用户**重载 MCP / 重启客户端**。
+3. 提醒用户在 **DBX「设置 → MCP」** 中管理连接 allowlist，并建议默认 **只读（`read_only`）**；需要写库时再由用户在 DBX 侧放开档位，且须满足下文「硬安全」的显式同意。
+4. 调用前先读当前工作区 `mcps/` 下 dbx 相关工具 schema（若已加载）。
+
+#### 硬安全：无同意禁写（DDL / DML）
+
+| 允许（默认） | 禁止（除非用户明确同意） |
+| --- | --- |
+| `SELECT` / 只读浏览 / 表结构只读查看 / 列出连接 | `INSERT` / `UPDATE` / `DELETE` / `REPLACE` / `MERGE` |
+| dry-run、说明拟执行的写语句供用户确认 | `CREATE` / `ALTER` / `DROP` / `TRUNCATE` / 其它 DDL |
+| | 任何会改数据或 schema 的存储过程 / 脚本批跑 |
+
+规则：
+
+- **工具能力 ≠ 授权**：即使 MCP 或 DBX 策略已放开 `safe_write` / `high_risk_write`，本 skill 仍要求**用户对本次写操作给出明确同意**后才可执行。
+- 「帮我查一下」「验证一下数据」**不等于**写库授权；写库须用户说出同意语义（如「可以 UPDATE」「允许改这张表」「授权 DML」）。
+- 用户自备数据库 MCP 时，同样遵守本硬安全规则。
+- 产物 / evidence 中的 SQL 摘要须**脱敏**（无账号密码明文）。
 
 ### 工具接入要点
 
 - **IDA MCP（ida-pro-mcp）**：需 IDA Pro 8.3+（推荐 9；Free 不支持）+ Python 3.11+ + uv + 激活 idalib；通用 MCP 客户端用 `ida-pro-mcp --config` 生成配置接入；headless 模式**每次调用须显式带 `database`**；进制转换一律用 `int_convert`，不自行换算。
 - **orange-wz MCP**：用 `ensure-mcp` 启动，端口 **10012–10029 自动顺延**；实际端点按 `mcp-runtime/endpoint.json` → `active-port.txt` → 回退 `http://127.0.0.1:10012/mcp` 解析；改 live `.img` 前先关客户端，**禁止 `save_as` 回写 loaded 根**，落盘用「另存 → 原子替换」。
 - **Photoshop MCP**：接入与路径见 [toolchain.md §7](toolchain.md#7-photoshop-mcp)（`~/.cursor/mcp.json` 的 `photoshop` / 工具侧 `user-photoshop`）；会话首次 `photoshop_ping`；出图前读 [ui-photoshop.md](ui-photoshop.md) 交互剧本、prompt 模板与状态派生；样式裁决 → 样板/路径 → 先 `normal` 再派生多状态 → preview 验收 → `vN` 导出；入库仍走 orange-wz。
+- **dbx MCP**：接入与路径见 [toolchain.md §8](toolchain.md#8-dbx数据库可视化--mcp)；触发前先问「集成 dbx / 自备 DB MCP」；同意集成后再问「AI 协助下载 / 用户自下」；装完后自动写入全局 `~/.cursor/mcp.json` 的 `dbx` 项；默认只读，DDL/DML 须另获明确同意。
 - 各工具的获取、构建、启动与客户端配置细节见 [toolchain.md](toolchain.md)。
 
 ## 验证门禁（按改动范围）
@@ -284,8 +343,9 @@ Task Progress:
 | WZ/资源 | verify / dry-run / 抽样节点 |
 | 插件 | IDA 校对 + 客户端验证步骤说明 |
 | 客户端 UI 图 | 按 ui-photoshop §12 验收清单：样式、尺寸/scale、多状态、禁区观感、样板并排、版本目录；入库则抽样节点 |
+| 库内数据验证 | 已获用户通道抉择（dbx / 自备 MCP / 暂不碰库）；写库须另有明确同意；查询结果可记入 evidence（脱敏） |
 
-环境缺失（如无 DB）导致测试无法跑时：如实记录，至少保证编译/打包，并列出未跑项。
+环境缺失（如无 DB / 用户选暂不碰库）导致测试无法跑时：如实记录，至少保证编译/打包，并列出未跑项。
 
 ## 文档与提交
 
@@ -310,6 +370,7 @@ Task Progress:
 - [ ] 跨端/跨版本同步已评估
 - [ ] 道具资源完整（或外观仅图标等情形已获用户确认并预留）
 - [ ] 若涉及客户端 UI 图：已按 [ui-photoshop.md](ui-photoshop.md) 走完交互剧本（样板/路径记忆、1x 默认、normal→派生、§12 验收）；版本目录 + manifest（含目标节点路径）齐全；需入库则已走 orange-wz
+- [ ] 若涉及库内数据：已询问并确认通道（dbx / 自备 DB MCP / 暂不碰库）；写库操作已获明确同意；未授权则仅只读查询
 - [ ] **产物已归档**（文档 + evidence/patches/清单）
 - [ ] 最终实现逻辑文档已补
 - [ ] 原子提交（若需要）
@@ -323,11 +384,12 @@ Task Progress:
 5. **脚本与资源一致**：NPC/任务/传送门与 String/Quest 等同步。  
 6. **不发明客户端能力**：客户端无 UI/协议则服务端不假装支持。  
 7. **全局复用**：方法论与模板可跨项目；具体路径与映射以当前仓库为准。  
-8. **沟通**：删节点、换密钥、不确定兼容性——先问再做。
+8. **沟通**：删节点、换密钥、不确定兼容性——先问再做。  
+9. **库安全**：无用户同意不写库；工具已放开写权限也不等于本会话已授权。
 
 ## 延伸阅读
 
 - [feature-doc-template.md](feature-doc-template.md)
 - [checklist.md](checklist.md)
-- [toolchain.md](toolchain.md) — 配套工具链集成（服务端 / 客户端 / 插件 / IDA MCP / orange-wz MCP / Photoshop MCP / MySQL 启停工具）
+- [toolchain.md](toolchain.md) — 配套工具链集成（服务端 / 客户端 / 插件 / IDA MCP / orange-wz MCP / Photoshop MCP / dbx MCP / MySQL 启停工具）
 - [ui-photoshop.md](ui-photoshop.md) — 客户端 UI 绘制规范（交互剧本、样板库、prompt 模板、状态派生、验收与入库）；接入见 [toolchain.md §7](toolchain.md#7-photoshop-mcp)

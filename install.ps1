@@ -151,6 +151,7 @@ function Check-Toolchain {
   Write-Host '  · MySQL 8 已启动（登录 8484 / API 8686 需服务端与库就绪）'
   Write-Host '  · orange-wz MCP 是否已启动（端口见 mcp-runtime/endpoint.json）'
   Write-Host '  · Adobe Photoshop + ~/.cursor/mcp.json 中 photoshop 项（见 toolchain.md §7）'
+  Write-Host '  · （可选）dbx：用户同意后接入；~/.cursor/mcp.json 中 dbx 项（见 toolchain.md §8）'
   Write-Host ''
   Write-Info '完整获取 / 构建 / 启动 / MCP 接入步骤见 toolchain.md'
 }

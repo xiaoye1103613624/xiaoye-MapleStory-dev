@@ -44,6 +44,7 @@
 | 客户端插件 | `ijl15.dll` 劫持插件、IDA 逆向校准 |
 | 资源 | WZ / IMG / XML、密钥转换、跨版本同步 |
 | 客户端 UI 图 | Photoshop MCP 出图 + 原生 UI 规范（样板库 / 模板 / 状态派生，见 ui-photoshop.md） |
+| 数据库 | dbx MCP（须用户同意后接入）或用户自备数据库 MCP；默认只读，DDL/DML 须明确授权 |
 | 工程 | 编码分层、单测与构建、产物保留、功能文档、原子提交 |
 
 它不是工具，而是一份**行为准则**：AI 加载后会按「先抉择 → 再计划 → 后实现 → 验证 → 归档 → 提交」的流程工作。
@@ -58,6 +59,7 @@
 - **禁止想象修改**：插件 / 二进制 / 协议改动必须用 IDA MCP 校准，禁止臆造偏移与签名。
 - **WZ / IMG / XML 走 MCP**：优先 orange-wz 等工具，禁止手改二进制猜字段。
 - **客户端 UI 图走 Photoshop MCP**：默认原生复刻；样板库 + prompt 模板；先 `normal` 再派生多状态；版本目录递增；规范见 [ui-photoshop.md](ui-photoshop.md)，接入见 [toolchain.md](toolchain.md#7-photoshop-mcp)。
+- **数据库操作先问再接**：需直接碰库或全流程校验含库内数据时，先问集成 [dbx](https://github.com/t8y2/dbx) 或用户自备数据库 MCP；同意集成后再问 AI 协助下载 / 用户自下，装完后自动注入全局 `~/.cursor/mcp.json`；**无明确同意禁止 DDL/DML**（仅 SELECT / 只读）。见 [SKILL.md](SKILL.md)「数据库操作与 dbx MCP」、[toolchain.md §8](toolchain.md#8-dbx数据库可视化--mcp)。
 - **资源同步意识**：多语言、多端、跨版本目录同步；道具资源保证完整性。
 - **编码防乱码**：源码 / i18n 用 UTF-8，游戏封包与插件 narrow UI 多为 GBK。
 - **闭环或显式预留**：逻辑 + 资源 + 配置 + i18n + 文档能齐则齐，否则写清预留与阻塞。
@@ -190,6 +192,7 @@ cp SKILL.md checklist.md feature-doc-template.md toolchain.md ui-photoshop.md \
 | **IDA MCP** | 让 AI 读 / 改 IDA Pro | https://github.com/mrexodia/ida-pro-mcp |
 | **orange-wz** | WZ / IMG 资源编辑器 **+ MCP 服务** | https://github.com/gujichu/orange-wz |
 | **Photoshop MCP** | 驱动本机 Adobe Photoshop 绘制 / 生成客户端 UI（Cursor：`npx @alisaitteke/photoshop-mcp`） | 接入见 [toolchain.md §7](toolchain.md#7-photoshop-mcp) |
+| **dbx** | 数据库可视化 + MCP（须用户同意后接入；默认只读） | https://github.com/t8y2/dbx ；接入见 [toolchain.md §8](toolchain.md#8-dbx数据库可视化--mcp) |
 | **NapMysqlTool** | 图形化 MySQL 启停 / 多实例管理 | https://github.com/SleepNap/NapMysqlTool |
 
 **环境速记**：Java 21、MySQL 8、Node v20.15.0 + Yarn、Maven、Visual Studio 2019（SDK10 / v142）、IDA Pro 8.3+（推荐 9）、Python 3.11+ 与 uv。
@@ -221,7 +224,7 @@ A：不行。主文件引用了其余文档（含 `toolchain.md` / `ui-photoshop
 A：不会，各平台目录相互独立。若希望统一维护，可只装到 `~/.agents/skills/`。
 
 **Q：装了 skill 却提示缺工具 / 不会接 MCP？**
-A：运行 `install.ps1 -Check`（或 `install.sh --check`）自检，再按 [toolchain.md](toolchain.md) 补齐服务端、插件、IDA MCP、orange-wz MCP、Photoshop MCP、MySQL 工具。Photoshop 路径与 `mcp.json` 示例见 [§7](toolchain.md#7-photoshop-mcp)。
+A：运行 `install.ps1 -Check`（或 `install.sh --check`）自检，再按 [toolchain.md](toolchain.md) 补齐服务端、插件、IDA MCP、orange-wz MCP、Photoshop MCP、dbx（可选）、MySQL 工具。Photoshop 见 [§7](toolchain.md#7-photoshop-mcp)；dbx 见 [§8](toolchain.md#8-dbx数据库可视化--mcp)（须先获用户同意再接入）。
 
 **Q：skill 没被触发？**
 A：确认目录名与 `SKILL.md` 的 `name` 一致；检查 `skillOverrides` 未被设为 `off`。
@@ -233,7 +236,7 @@ A：确认目录名与 `SKILL.md` 的 `name` 一致；检查 `skillOverrides` �
 | 文档 | 内容 |
 | --- | --- |
 | [SKILL.md](SKILL.md) | 开发规范主体：门禁、计划流程、闭环定义 |
-| [toolchain.md](toolchain.md) | 配套工具链集成：服务端 / 客户端 / 插件 / IDA MCP / orange-wz MCP / Photoshop MCP / MySQL 工具 |
+| [toolchain.md](toolchain.md) | 配套工具链集成：服务端 / 客户端 / 插件 / IDA MCP / orange-wz MCP / Photoshop MCP / dbx MCP / MySQL 工具 |
 | [ui-photoshop.md](ui-photoshop.md) | 客户端 UI 绘制：交互剧本、原生样板库、prompt 模板、状态派生、验收清单、入库 recipe；接入见 [toolchain.md §7](toolchain.md#7-photoshop-mcp) |
 | [checklist.md](checklist.md) | 交付前逐项检查清单 |
 | [feature-doc-template.md](feature-doc-template.md) | 功能最终实现逻辑文档模板 |

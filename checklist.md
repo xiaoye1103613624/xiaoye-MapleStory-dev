@@ -37,6 +37,11 @@
   - [ ] 先 `normal` 再派生多状态；可点态齐全；经 Photoshop MCP preview 自检
   - [ ] §12 验收清单逐项已过；需入库则走 orange-wz（load → 写节点 → save_as → 原子替换）
   - [ ] 接入见 [toolchain.md §7](toolchain.md#7-photoshop-mcp)
+- [ ] 数据库 / 库内数据验证（详见 [SKILL.md「数据库操作与 dbx MCP」](SKILL.md#数据库操作与-dbx-mcp)、[toolchain.md §8](toolchain.md#8-dbx数据库可视化--mcp)）：
+  - [ ] 已询问通道：集成 dbx / 用户自备数据库 MCP / 暂不碰库
+  - [ ] 若选 dbx：已问下载方式（AI 协助 / 用户自下）；装完后已注入全局 `~/.cursor/mcp.json` 的 `dbx`
+  - [ ] 写库（DDL/DML）已获用户明确同意；未授权则仅 SELECT / 只读
+  - [ ] 查询 / 变更摘要已脱敏记入产物（若有）
 - [ ] 跨端 / 多语言资源同步已评估
 - [ ] 道具：本地其它目录已查；缺失时已用小册子等资源站补齐或显式预留
 - [ ] 外观道具：非「仅图标」完整同步，或仅图标时已获用户确认
